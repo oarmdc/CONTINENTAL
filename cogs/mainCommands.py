@@ -63,15 +63,23 @@ class mainCommands(commands.Cog):
         if ctx.voice_client is None:
             await send_error_embed(ctx, "I'm not connected to a voice channel.")
             return
-        if not ctx.voice_client.is_playing():
+        if not ctx.voice_client.is_playing() and not ctx.voice_client.is_paused():
             await send_error_embed(ctx, "Nothing is playing right now.")
             return
         ctx.voice_client.stop()
         await send_success_embed(ctx, "Music is now stopped.")
 
     @commands.command()
-    async def disconnect(self, ctx):
-        ...
+    async def leave(self, ctx):
+        if ctx.author.voice is None:
+            await send_error_embed(ctx, "You are not connected to a voice channel.")
+            return
+        if ctx.voice_client is None:
+            await send_error_embed(ctx, "I'm not connected to a voice channel.")
+            return
+        ctx.voice_client.stop()
+        await ctx.voice_client.disconnect()
+        await send_success_embed(ctx, "I am now disconnected from the voice channel.")
 
 async def setup(bot):
     await bot.add_cog(mainCommands(bot))
