@@ -48,7 +48,7 @@ CONTINENTAL/
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/CONTINENTAL.git
+git clone https://github.com/oarmdc/CONTINENTAL.git
 cd CONTINENTAL
 python -m venv venv
 venv\Scripts\activate        # Windows
