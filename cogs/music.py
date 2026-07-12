@@ -55,7 +55,7 @@ class Music(commands.Cog):
         if ctx.voice_client is None:
             await send_error_embed(ctx, "I'm not connected to a voice channel.")
             return
-        ctx.voice_client.stop()
+        await ctx.voice_client.stop()
         await ctx.voice_client.disconnect()
         await send_success_embed(ctx, "I am now disconnected from the voice channel.")
 
