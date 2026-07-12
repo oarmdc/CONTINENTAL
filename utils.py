@@ -12,7 +12,7 @@ async def update_presence(thatbot):
         activity=discord.Game(name=f"with {len(thatbot.guilds)} servers!")
         )
     
-async def make_embed(ctx, title, *, image=None, thumbnail=None, description=None, color=None):
+def make_embed(ctx, title, *, image=None, thumbnail=None, description=None, color=None):
     embed = discord.Embed(title=title, description=description, color=color)
     if image:
         embed.set_image(url=image)
