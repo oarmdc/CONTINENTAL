@@ -44,7 +44,7 @@ class Music(commands.Cog):
         if not ctx.voice_client.is_playing() and not ctx.voice_client.is_paused():
             await send_error_embed(ctx, "Nothing is playing right now.")
             return
-        ctx.voice_client.stop()
+        await ctx.voice_client.stop()
         await send_success_embed(ctx, "Music is now stopped.")
 
     @commands.command()
