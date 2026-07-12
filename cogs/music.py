@@ -41,7 +41,7 @@ class Music(commands.Cog):
         if ctx.voice_client is None:
             await send_error_embed(ctx, "I'm not connected to a voice channel.")
             return
-        if not ctx.voice_client.is_playing() and not ctx.voice_client.is_paused():
+        if not ctx.voice_client.playing and not ctx.voice_client.paused:
             await send_error_embed(ctx, "Nothing is playing right now.")
             return
         await ctx.voice_client.stop()
