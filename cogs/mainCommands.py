@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import yt_dlp
 from utils import update_presence, make_embed, send_error_embed, send_success_embed
+import wavelink
 
 class mainCommands(commands.Cog):
     def __init__(self, bot):
@@ -33,7 +34,7 @@ class mainCommands(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def play(self, ctx, *, query=None):
+    async def play(self, ctx, *, query:str):
         if ctx.author.voice is None:
             await send_error_embed(ctx, "You are not connected to a voice channel.")
             return
@@ -44,16 +45,18 @@ class mainCommands(commands.Cog):
             await send_error_embed(ctx, "Dont forget to add the song name/url...")
             return
         if ctx.voice_client is None:
-            await ctx.author.voice.channel.connect(self_deaf=True)
+            player = await ctx.author.voice.channel.connect(cls=wavelink.Player, self_deaf=True)
+            player.inactive_timeout = 300
+        else:
+            player = ctx.voice_client
         
-        ydl_opts = {"format": "bestaudio", "noplaylist": True}
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(f"ytsearch:{query}", download=False)["entries"][0]
-            stream_url = info["url"]
-        source = discord.FFmpegPCMAudio(stream_url)
-        ctx.voice_client.play(source)
-        
-        await ctx.send(embed=make_embed(ctx, f"Now playing {info['title']}", image=info['thumbnail'], color=discord.Color.light_grey()))
+        tracks = await wavelink.Playable.search(query)
+        if not tracks:
+            await send_error_embed(ctx, "No tracks found.")
+            return
+        track = tracks[0]
+        await player.play(track)
+        await ctx.send(embed=make_embed(ctx, f"Playing now {track.title}", image=track.artwork, color=discord.Color.light_grey()))
     
     @commands.command()
     async def stop(self, ctx):
