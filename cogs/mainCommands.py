@@ -69,5 +69,9 @@ class mainCommands(commands.Cog):
         ctx.voice_client.stop()
         await send_success_embed(ctx, "Music is now stopped.")
 
+    @commands.command()
+    async def disconnect(self, ctx):
+        ...
+
 async def setup(bot):
     await bot.add_cog(mainCommands(bot))
