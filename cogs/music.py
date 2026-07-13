@@ -10,12 +10,26 @@ class Music(commands.Cog):
 
     @commands.Cog.listener()
     async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload):
+        if payload.reason == "loadFailed":
+            return
         player = payload.player
         if player and not player.queue.is_empty:
             next_track = player.queue.get()
+            player.retried = False
             await player.play(next_track)
             await player.home.send(embed=make_embed(None, f"Playing now: {next_track.title}", image=next_track.artwork, color=discord.Color.light_grey()))
 
+    @commands.Cog.listener()
+    async def on_wavelink_track_exception(self, payload: wavelink.TrackExceptionEventPayload):
+        player = payload.player
+        if player is None:
+            return
+        if not getattr(player, "retried", False):
+            player.retried = True
+            await player.play(payload.track)
+        else:
+            player.retried = False
+    
     @commands.command()
     async def play(self, ctx, *, query:str):
         if ctx.author.voice is None:
@@ -43,6 +57,7 @@ class Music(commands.Cog):
             player.queue.put(track)
             await ctx.send(embed=make_embed(ctx, f"Added to queue: {track.title}", thumbnail=track.artwork, color=discord.Color.light_grey()))
         else:
+            player.retried = False
             await player.play(track)
             await ctx.send(embed=make_embed(ctx, f"Playing now: {track.title}", image=track.artwork, color=discord.Color.light_grey()))
     
