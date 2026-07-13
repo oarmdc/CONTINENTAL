@@ -18,6 +18,8 @@ class Music(commands.Cog):
             player.retried = False
             await player.play(next_track)
             await player.home.send(embed=make_embed(None, f"Playing now: {next_track.title}", image=next_track.artwork, color=discord.Color.light_grey()))
+        elif player and payload.reason == "finished":
+            await player.home.send(embed=make_embed(None, "Queue finished.", color=discord.Color.light_grey()))
 
     @commands.Cog.listener()
     async def on_wavelink_track_exception(self, payload: wavelink.TrackExceptionEventPayload):
@@ -53,7 +55,7 @@ class Music(commands.Cog):
             await send_error_embed(ctx, "No tracks found.")
             return
         track = tracks[0]
-        if player.playing:
+        if player.playing or player.current:
             player.queue.put(track)
             await ctx.send(embed=make_embed(ctx, f"Added to queue: {track.title}", thumbnail=track.artwork, color=discord.Color.light_grey()))
         else:
