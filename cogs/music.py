@@ -47,6 +47,20 @@ class Music(commands.Cog):
             await ctx.send(embed=make_embed(ctx, f"Playing now: {track.title}", image=track.artwork, color=discord.Color.light_grey()))
     
     @commands.command()
+    async def skip(self, ctx):
+        if ctx.author.voice is None:
+            await send_error_embed(ctx, "You are not connected to a voice channel.")
+            return
+        if ctx.voice_client is None:
+            await send_error_embed(ctx, "I'm not connected to a voice channel.")
+            return
+        if not ctx.voice_client.playing and not ctx.voice_client.paused:
+            await send_error_embed(ctx, "Nothing is playing right now.")
+            return
+        await ctx.voice_client.stop()
+        await send_success_embed(ctx, "Skipped.")
+
+    @commands.command()
     async def stop(self, ctx):
         if ctx.author.voice is None:
             await send_error_embed(ctx, "You are not connected to a voice channel.")
