@@ -9,7 +9,6 @@ class Events(commands.Cog):
     @commands.Cog.listener("on_guild_remove")
     @commands.Cog.listener("on_guild_join")
     async def on_guild_change(self, guild):
-        print(f"Guild change: {guild.name}, now in {len(self.bot.guilds)} servers")
         await update_presence(self.bot)
     
     @commands.Cog.listener()
