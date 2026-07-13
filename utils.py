@@ -18,10 +18,11 @@ def make_embed(ctx, title, *, image=None, thumbnail=None, description=None, colo
         embed.set_image(url=image)
     if thumbnail:
         embed.set_thumbnail(url=thumbnail)
-    embed.set_author(
-        name=f"Command requested by {ctx.author}",
-        icon_url=ctx.author.display_avatar.url
-    )
+    if ctx is not None:
+        embed.set_author(
+            name=f"Command requested by {ctx.author}",
+            icon_url=ctx.author.display_avatar.url
+        )
     embed.set_footer(text="coded by oarm")
     return embed
 
