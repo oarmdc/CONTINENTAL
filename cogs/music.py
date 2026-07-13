@@ -88,5 +88,13 @@ class Music(commands.Cog):
         await ctx.voice_client.disconnect()
         await send_success_embed(ctx, "I am now disconnected from the voice channel.")
 
+    @commands.command()
+    async def queue(self, ctx):
+        if ctx.voice_client is None or ctx.voice_client.queue.is_empty:
+            await send_error_embed(ctx, "The queue is empty.")
+            return
+        songs = "\n".join(f"{i+1}. {track.title}" for i, track in enumerate(ctx.voice_client.queue))
+        await ctx.send(embed=make_embed(ctx, "Queue", description=songs, color=discord.Color.light_grey()))
+
 async def setup(bot):
     await bot.add_cog(Music(bot))
