@@ -12,18 +12,20 @@ async def update_presence(thatbot):
         activity=discord.Game(name=f"with {len(thatbot.guilds)} servers!")
         )
     
-def make_embed(ctx, title, *, image=None, thumbnail=None, description=None, color=None):
-    embed = discord.Embed(title=title, description=description, color=color)
+def make_embed(ctx, title, *, image=None, thumbnail=None, description=None, color=None, timestamp=None, author=None):
+    embed = discord.Embed(title=title, description=description, color=color, timestamp=timestamp)
     if image:
         embed.set_image(url=image)
     if thumbnail:
         embed.set_thumbnail(url=thumbnail)
-    if ctx is not None:
+    if author:
+        embed.set_author(name=author[0], icon_url=author[1])
+    elif ctx is not None:
         embed.set_author(
             name=f"Command requested by {ctx.author}",
             icon_url=ctx.author.display_avatar.url
         )
-    embed.set_footer(text="coded by oarm")
+    embed.set_footer(text="coded by oarm & camarovx")
     return embed
 
 async def send_error_embed(ctx, message):

@@ -52,15 +52,13 @@ class Snipe(commands.Cog):
             return
 
         embed = make_embed(
-            None,
-            "🔫 Sniped Message",
+            ctx,
+            f"🔫 Sniped Message of {data['author'].display_name}",
             description=data["content"],
             color=discord.Color.orange(),
+            timestamp=data["timestamp"],
+            image=data["attachment"],
         )
-        embed.set_author(name=str(data["author"]), icon_url=data["avatar"])
-        embed.timestamp = data["timestamp"]
-        if data["attachment"]:
-            embed.set_image(url=data["attachment"])
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -71,14 +69,13 @@ class Snipe(commands.Cog):
             return
 
         embed = make_embed(
-            None,
-            "✏️ Edited Message",
+            ctx,
+            f"✏️ Edited Message of {data['author'].display_name}",
             color=discord.Color.orange(),
+            timestamp=data["timestamp"],
         )
-        embed.set_author(name=str(data["author"]), icon_url=data["avatar"])
         embed.add_field(name="Before", value=data["before"], inline=False)
         embed.add_field(name="After", value=data["after"], inline=False)
-        embed.timestamp = data["timestamp"]
         await ctx.send(embed=embed)
 
 
