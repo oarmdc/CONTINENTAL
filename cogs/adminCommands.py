@@ -4,11 +4,14 @@ from utils import make_embed, send_error_embed, send_success_embed
 
 class adminCommands(commands.Cog):
     def __init__(self, bot):
-        self = bot
+        self.bot = bot
 
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def ban(self, ctx, member: discord.Member, *, reason=None):
+        if ctx.author.id != ctx.guild.owner_id and member.id == ctx.guild.owner_id:
+            await send_error_embed(ctx, "You can't ban the owner, man..")
+            return
         if ctx.author.id != ctx.guild.owner_id and member.guild_permissions.administrator:
             await send_error_embed(ctx, "You can't ban another admin.")
             return
