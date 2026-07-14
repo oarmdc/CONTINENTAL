@@ -24,11 +24,12 @@ async def on_wavelink_node_ready(payload: wavelink.NodeReadyEventPayload):
 
 @bot.event
 async def setup_hook():
-    #await bot.load_extension("cogs.mainCommands")
+    await bot.load_extension("cogs.mainCommands")
     #await bot.load_extension("cogs.music")
     #await bot.load_extension("cogs.events")
     #await bot.load_extension("cogs.snipe")
     #await bot.load_extension("cogs.adminCommands")
+    await bot.tree.sync()
     node = wavelink.Node(uri=f"http://{os.getenv('LAVALINK_HOST')}:2333", password=os.getenv("LAVALINK_PASSWORD"))
     await wavelink.Pool.connect(nodes=[node], client=bot)
 
