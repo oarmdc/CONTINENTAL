@@ -6,6 +6,7 @@ class adminCommands(commands.Cog):
     def __init__(self, bot):
         self = bot
 
+    @commands.command()
     @commands.has_permissions(administrator=True)
     async def ban(self, ctx, member: discord.Member, *, reason=None):
         if ctx.author.id != ctx.guild.owner_id and member.guild_permissions.administrator:
