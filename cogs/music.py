@@ -49,7 +49,7 @@ class music(commands.Cog):
             player = interaction.guild.voice_client
         player.home = interaction.channel
         
-        tracks = await wavelink.Playable.search(query)
+        tracks = await wavelink.Playable.search(query, source=wavelink.TrackSource.SoundCloud)
         if not tracks:
             await send_error_embed(interaction, "No tracks found.")
             return
