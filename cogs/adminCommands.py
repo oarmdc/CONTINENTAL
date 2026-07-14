@@ -24,5 +24,23 @@ class adminCommands(commands.Cog):
         elif isinstance(error, commands.MemberNotFound):
             await send_error_embed(ctx, "That user isn't in this server.")
 
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def kick(self, ctx, member: discord.Member, *, reason=None):
+        if ctx.author.id != ctx.guild.owner_id and member.id == ctx.guild.owner_id:
+            await send_error_embed(ctx, "You can't kick the owner, man..")
+            return
+        if ctx.author.id != ctx.guild.owner_id and member.guild_permissions.administrator:
+            await send_error_embed(ctx, "You can't kick another admin.")
+            return
+        await member.kick(reason=reason)
+        await send_success_embed(ctx, f"{member.name} is now kicked.")
+    @kick.error
+    async def kick_error(self, ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            await send_error_embed(ctx, "You don't have permission to use this command.")
+        elif isinstance(error, commands.MemberNotFound):
+            await send_error_embed(ctx, "That user isn't in this server.")
+
 async def setup(bot):
     await bot.add_cog(adminCommands(bot))
