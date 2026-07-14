@@ -4,7 +4,7 @@ import wavelink
 from utils import make_embed, send_error_embed, send_success_embed
 
 
-class Music(commands.Cog):
+class music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -114,4 +114,4 @@ class Music(commands.Cog):
         await ctx.send(embed=make_embed(ctx, "Queue", description=songs, color=discord.Color.light_grey()))
 
 async def setup(bot):
-    await bot.add_cog(Music(bot))
+    await bot.add_cog(music(bot))

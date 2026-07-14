@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from utils import update_presence, make_embed, send_error_embed, send_success_embed
+from utils import make_embed
 
 class mainCommands(commands.Cog):
     def __init__(self, bot):
