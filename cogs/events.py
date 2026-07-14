@@ -10,13 +10,6 @@ class Events(commands.Cog):
     @commands.Cog.listener("on_guild_join")
     async def on_guild_change(self, guild):
         await update_presence(self.bot)
-    
-    @commands.Cog.listener()
-    async def on_command(self, ctx):
-        try:
-            await ctx.message.delete()
-        except (discord.Forbidden, discord.NotFound):
-            pass
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
