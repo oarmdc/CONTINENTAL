@@ -6,7 +6,7 @@ from utils import make_embed, send_error_embed, send_success_embed
 class adminCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
+    
     @app_commands.command(description="Ban a member from the server")
     @app_commands.checks.has_permissions(administrator=True)
     async def ban(self, interaction: discord.Interaction, member: discord.Member, reason: str = None):
