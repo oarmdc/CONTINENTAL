@@ -22,7 +22,7 @@ def make_embed(interaction, title, *, image=None, thumbnail=None, description=No
     return embed
 
 async def send_error_embed(interaction, message):
-    await interaction.response.send_message(embed=make_embed(interaction, "Error", description=message, color=discord.Color.red()))
+    await interaction.response.send_message(embed=make_embed(interaction, "Error", description=message, color=discord.Color.red()), ephemeral=True)
 
 async def send_success_embed(interaction, message):
-    await interaction.response.send_message(embed=make_embed(interaction, "Success", description=message, color=discord.Color.green()))
+    await interaction.response.send_message(embed=make_embed(interaction, "Success", description=message, color=discord.Color.green()), ephemeral=True)
