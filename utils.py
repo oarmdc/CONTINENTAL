@@ -1,18 +1,11 @@
 import discord
 
-def parse(text, start, end):
-    start_index = text.find(start) + len(start)
-    end_index = text.find(end, start_index)
-    if start_index == -1 or end_index == -1:
-        return None
-    return text[start_index:end_index]
-
 async def update_presence(thatbot):
     await thatbot.change_presence(
         activity=discord.Game(name=f"with {len(thatbot.guilds)} servers!")
         )
     
-def make_embed(ctx, title, *, image=None, thumbnail=None, description=None, color=None, timestamp=None, author=None):
+def make_embed(interaction, title, *, image=None, thumbnail=None, description=None, color=None, timestamp=None, author=None):
     embed = discord.Embed(title=title, description=description, color=color, timestamp=timestamp)
     if image:
         embed.set_image(url=image)
@@ -20,16 +13,16 @@ def make_embed(ctx, title, *, image=None, thumbnail=None, description=None, colo
         embed.set_thumbnail(url=thumbnail)
     if author:
         embed.set_author(name=author[0], icon_url=author[1])
-    elif ctx is not None:
+    elif interaction is not None:
         embed.set_author(
-            name=f"Command requested by {ctx.author}",
-            icon_url=ctx.author.display_avatar.url
+            name=f"Command requested by {interaction.user}",
+            icon_url=interaction.user.display_avatar.url
         )
     embed.set_footer(text="coded by oarm & camarovx")
     return embed
 
-async def send_error_embed(ctx, message):
-    await ctx.send(embed=make_embed(ctx, "Error", description=message, color=discord.Color.red()))
+async def send_error_embed(interaction, message):
+    await interaction.response.send_message(embed=make_embed(interaction, "Error", description=message, color=discord.Color.red()))
 
-async def send_success_embed(ctx, message):
-    await ctx.send(embed=make_embed(ctx, "Success", description=message, color=discord.Color.green()))
+async def send_success_embed(interaction, message):
+    await interaction.response.send_message(embed=make_embed(interaction, "Success", description=message, color=discord.Color.green()))
