@@ -7,6 +7,9 @@ A Discord bot built with Python and [discord.py](https://github.com/Rapptz/disco
 ## Features
 
 - 🎵 **Music playback** — YouTube links, YouTube search, and Spotify links (via Lavalink + LavaSrc)
+- 📜 **Queue system** — queue up multiple songs, auto-plays the next one when a track ends
+- 🔁 **Auto-retry on load failures** — automatically retries a track once if YouTube playback fails
+- 🔫 **Snipe** — recover recently deleted or edited messages
 - 👋 **Welcome & leave messages**
 - 🧹 **Auto-deletes command messages** to keep channels clean
 - 📊 **Dynamic presence** showing server count
@@ -15,11 +18,15 @@ A Discord bot built with Python and [discord.py](https://github.com/Rapptz/disco
 
 | Command | Description |
 |---------|-------------|
-| `leo.play <song name / URL>` | Plays a song from YouTube or Spotify. Joins your voice channel automatically. |
-| `leo.stop` | Stops the current song. |
+| `leo.play <song name / URL>` | Plays a song, or adds it to the queue if something is already playing. Joins your voice channel automatically. |
+| `leo.skip` | Skips the current song and plays the next one in queue. |
+| `leo.queue` | Shows the current song queue. |
+| `leo.stop` | Stops playback and clears the queue. |
 | `leo.leave` | Disconnects the bot from the voice channel. |
+| `leo.snipe` | Shows the last deleted message in the channel. |
+| `leo.editsnipe` | Shows the last edited message in the channel (before & after). |
 
-More commands (queue, pause/resume, skip, tickets) are planned.
+More commands (pause/resume, tickets) are planned.
 
 ## Tech Stack
 
@@ -40,7 +47,8 @@ CONTINENTAL/
 └── cogs/
     ├── mainCommands.py  # General commands
     ├── music.py         # Music commands
-    └── events.py        # Event listeners
+    ├── events.py        # Event listeners
+    └── snipe.py         # Snipe commands (deleted/edited messages)
 ```
 
 ## Setup
@@ -79,4 +87,4 @@ python bot.py
 
 ## Credits
 
-Developed by **Omar** and partner. Built as a learning project — from `yt-dlp` beginnings to a self-hosted Lavalink server.
+Developed by **oarm** and **camarovx**. Built as a learning project — from `yt-dlp` beginnings to a self-hosted Lavalink server.
