@@ -1,40 +1,35 @@
 # CONTINENTAL
 
-A Discord bot built with Python and [discord.py](https://github.com/Rapptz/discord.py), featuring music playback powered by a self-hosted [Lavalink](https://github.com/lavalink-devs/Lavalink) server.
-
-**Prefix:** `leo.`
+A Discord bot built with Python and [discord.py](https://github.com/Rapptz/discord.py), featuring music playback powered by a self-hosted [Lavalink](https://github.com/lavalink-devs/Lavalink) server. All commands are slash commands.
 
 ## Features
 
-- 🎵 **Music playback** — YouTube links, YouTube search, and Spotify links (via Lavalink + LavaSrc)
+- 🎵 **Music playback** — SoundCloud search, Spotify links, and direct YouTube links (via Lavalink + LavaSrc)
 - 📜 **Queue system** — queue up multiple songs, auto-plays the next one when a track ends
-- 🔁 **Auto-retry on load failures** — automatically retries a track once if YouTube playback fails
 - 🔫 **Snipe** — recover recently deleted or edited messages
 - 👋 **Welcome & leave messages**
-- 🧹 **Auto-deletes command messages** to keep channels clean
 - 📊 **Dynamic presence** showing server count
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `leo.play <song name / URL>` | Plays a song, or adds it to the queue if something is already playing. Joins your voice channel automatically. |
-| `leo.skip` | Skips the current song and plays the next one in queue. |
-| `leo.queue` | Shows the current song queue. |
-| `leo.stop` | Stops playback and clears the queue. |
-| `leo.leave` | Disconnects the bot from the voice channel. |
-| `leo.snipe` | Shows the last deleted message in the channel. |
-| `leo.editsnipe` | Shows the last edited message in the channel (before & after). |
-
-More commands (pause/resume, tickets) are planned.
+| Command                    | Description                                                                                                    |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `/play <song name / URL>`  | Plays a song, or adds it to the queue if something is already playing. Joins your voice channel automatically. |
+| `/skip`                    | Skips the current song and plays the next one in queue.                                                        |
+| `/queue`                   | Shows the current song queue.                                                                                  |
+| `/stop`                    | Stops playback and clears the queue.                                                                           |
+| `/leave`                   | Disconnects the bot from the voice channel.                                                                    |
+| `/snipe`                   | Shows the last deleted message in the channel.                                                                 |
+| `/editsnipe`               | Shows the last edited message in the channel (before & after).                                                 |
+| `/pfp [member]`            | Shows a member's avatar. Leave empty for your own.                                                             |
 
 ## Tech Stack
 
 - **Python 3.12** with [discord.py](https://github.com/Rapptz/discord.py)
 - **[Wavelink](https://github.com/PythonistaGuild/Wavelink)** — Lavalink client for discord.py
 - **[Lavalink v4](https://github.com/lavalink-devs/Lavalink)** — audio server (self-hosted on a VPS)
-  - [youtube-source](https://github.com/lavalink-devs/youtube-source) plugin
-  - [LavaSrc](https://github.com/topi314/LavaSrc) plugin for Spotify support
+  - **SoundCloud** as the primary audio source
+  - [LavaSrc](https://github.com/topi314/LavaSrc) plugin — Spotify links resolved through SoundCloud
 - **python-dotenv** for configuration
 
 ## Project Structure
@@ -55,7 +50,7 @@ CONTINENTAL/
 
 ### 1. Clone and install
 
-```bash
+```
 git clone https://github.com/oarmdc/CONTINENTAL.git
 cd CONTINENTAL
 python -m venv venv
@@ -77,11 +72,11 @@ LAVALINK_PASSWORD=your_lavalink_password
 
 ### 3. Lavalink server
 
-This bot requires a running **Lavalink v4** server with the `youtube-source` and `LavaSrc` plugins. See the [Lavalink docs](https://lavalink.dev/) for hosting instructions.
+This bot requires a running **Lavalink v4** server with SoundCloud enabled and the `LavaSrc` plugin for Spotify support. See the [Lavalink docs](https://lavalink.dev/) for hosting instructions.
 
 ### 4. Run
 
-```bash
+```
 python bot.py
 ```
 
