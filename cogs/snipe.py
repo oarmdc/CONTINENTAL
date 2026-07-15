@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord import app_commands
 from datetime import datetime, timezone
 from utils import make_embed, send_error_embed
 
@@ -44,39 +45,39 @@ class Snipe(commands.Cog):
             "timestamp": datetime.now(timezone.utc),
         }
 
-    @commands.command()
-    async def snipe(self, ctx):
-        data = self.deleted_messages.get(ctx.channel.id)
+    @app_commands.command()
+    async def snipe(self, interaction: discord.Interaction):
+        data = self.deleted_messages.get(interaction.channel.id)
         if data is None:
-            await send_error_embed(ctx, "There's nothing to snipe in this channel.")
+            await send_error_embed(interaction, "There's nothing to snipe in this channel.")
             return
 
         embed = make_embed(
-            ctx,
+            interaction,
             f"🔫 Sniped Message of {data['author'].display_name}",
             description=data["content"],
             color=discord.Color.orange(),
             timestamp=data["timestamp"],
             image=data["attachment"],
         )
-        await ctx.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
-    @commands.command()
-    async def editsnipe(self, ctx):
-        data = self.edited_messages.get(ctx.channel.id)
+    @app_commands.command()
+    async def editsnipe(self, interaction: discord.Interaction):
+        data = self.edited_messages.get(interaction.channel.id)
         if data is None:
-            await send_error_embed(ctx, "There's nothing to editsnipe in this channel.")
+            await send_error_embed(interaction, "There's nothing to editsnipe in this channel.")
             return
 
         embed = make_embed(
-            ctx,
+            interaction,
             f"✏️ Edited Message of {data['author'].display_name}",
             color=discord.Color.orange(),
             timestamp=data["timestamp"],
         )
         embed.add_field(name="Before", value=data["before"], inline=False)
         embed.add_field(name="After", value=data["after"], inline=False)
-        await ctx.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
 async def setup(bot):
