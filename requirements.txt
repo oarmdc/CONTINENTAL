@@ -1,3 +1,4 @@
 discord.py
 wavelink
 python-dotenv
+aiosqlite
