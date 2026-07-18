@@ -83,5 +83,26 @@ class Levels(commands.Cog):
                              color=discord.Color.gold())
         )
 
+    @app_commands.command(description="Show the top 10 users by level")
+    async def leaderboard(self, interaction: discord.Interaction):
+        async with self.db.execute(
+            "SELECT user_id, xp, level FROM levels WHERE guild_id = ? ORDER BY level DESC, xp DESC LIMIT 10",
+            (interaction.guild.id, )
+        ) as cursor:
+            rows = await cursor.fetchall()
+        if not rows:
+            await send_error_embed(interaction, "Nobody has any XP yet.")
+            return
+        lines = []
+        for i, (user_id, xp, level) in enumerate(rows, start= 1):
+            member = interaction.guild.get_member(user_id)
+            name = member.display_name if member else f"Unknown ({user_id})"
+            lines.append(f"**{i}** {name} - Level {level} ({xp} XP)")
+        await interaction.response.send_message(
+            embed=make_embed(interaction, f"Leaderboard | {interaction.guild.name}",
+                             description="\n".join(lines),
+                             color=discord.Color.gold())
+        )
+
 async def setup(bot):
     await bot.add_cog(Levels(bot))
