@@ -4,6 +4,7 @@ import asyncio
 import os
 from dotenv import load_dotenv
 import wavelink
+import aiosqlite
 
 load_dotenv()
 intents = discord.Intents.default()
@@ -24,6 +25,7 @@ async def on_wavelink_node_ready(payload: wavelink.NodeReadyEventPayload):
 
 @bot.event
 async def setup_hook():
+    bot.db = await aiosqlite.connect("levels.db")
     await bot.load_extension("cogs.mainCommands")
     await bot.load_extension("cogs.music")
     await bot.load_extension("cogs.events")
@@ -35,7 +37,11 @@ async def setup_hook():
     await wavelink.Pool.connect(nodes=[node], client=bot)
 
 async def main():
-    async with bot:
-        await bot.start(os.getenv("DISCORD_TOKEN"))
+    try:
+        async with bot:
+            await bot.start(os.getenv("DISCORD_TOKEN"))
+    finally:
+        if getattr(bot, "db", None):
+            await bot.db.close()
 
 asyncio.run(main())
