@@ -25,7 +25,7 @@ async def on_wavelink_node_ready(payload: wavelink.NodeReadyEventPayload):
 
 @bot.event
 async def setup_hook():
-    bot.db = await aiosqlite.connect("levels.db")
+    bot.db = await aiosqlite.connect("database.db")
     await bot.load_extension("cogs.mainCommands")
     await bot.load_extension("cogs.music")
     await bot.load_extension("cogs.events")
