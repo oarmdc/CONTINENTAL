@@ -39,6 +39,16 @@ class mainCommands(commands.Cog):
         await self.bot.db.commit()
         await send_success_embed(interaction, f"Birthday saved for {interaction.user.display_name}: **{day:02d}.{month:02d}.** 🎂")
 
+    @app_commands.command(description="Remove your saved birthday")
+    async def removebirthday(self, interaction: discord.Interaction):
+        cursor = await self.bot.db.execute("DELETE FROM birthdays WHERE user_id = ?",
+                                           (interaction.user.id,)
+                                           )
+        await self.bot.db.commit()
+        if cursor.rowcount == 0:
+            await send_error_embed(interaction, "You don't have a birthday saved.")
+            return
+        await send_success_embed(interaction, "Your birthday has been removed. 🗑️")
 
 async def setup(bot):
     await bot.add_cog(mainCommands(bot))
