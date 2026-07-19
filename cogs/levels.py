@@ -1,19 +1,16 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-import aiosqlite
 import time
 from utils import make_embed, send_error_embed
 
 class Levels(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.db = None
         self.cooldowns = {}
 
     async def cog_load(self):
-        self.db = await aiosqlite.connect("levels.db")
-        await self.db.execute("""
+        await self.bot.db.execute("""
             CREATE TABLE IF NOT EXISTS levels (
                 user_id INTEGER,
                 guild_id INTEGER,
@@ -22,10 +19,7 @@ class Levels(commands.Cog):
                 PRIMARY KEY (user_id, guild_id)
             )
         """)
-        await self.db.commit()
-
-    async def cog_unload(self):
-        await self.db.close()
+        await self.bot.db.commit()
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -38,14 +32,14 @@ class Levels(commands.Cog):
             if now - self.cooldowns.get(key, 0) < 60:
                 return
             self.cooldowns[key] = now
-        await self.db.execute("""
+        await self.bot.db.execute("""
             INSERT INTO levels (user_id, guild_id, xp)
             VALUES (?, ?, 15)
             ON CONFLICT(user_id, guild_id)
             DO UPDATE SET xp = xp + 15
         """, (message.author.id, message.guild.id))
 
-        async with self.db.execute(
+        async with self.bot.db.execute(
             "SELECT xp, level FROM levels WHERE user_id = ? AND guild_id = ?",
             (message.author.id, message.guild.id)
         ) as cursor:
@@ -54,7 +48,7 @@ class Levels(commands.Cog):
 
         needed = 100 + (level * 50)
         if xp >= needed:
-            await self.db.execute(
+            await self.bot.db.execute(
                 "UPDATE levels SET xp = xp - ?, level = level + 1 WHERE user_id = ? AND guild_id = ?",
                 (needed, message.author.id, message.guild.id)
             )
@@ -62,12 +56,12 @@ class Levels(commands.Cog):
                 embed=make_embed(None, f"Level UP! | {message.guild}", description=f"🎉 {message.author.display_name} reached level {level + 1}!", color=discord.Color.gold())
             )
 
-        await self.db.commit()
+        await self.bot.db.commit()
     
     @app_commands.command(description="Show your level and XP")
     async def rank(self, interaction: discord.Interaction, member: discord.Member = None):
         member = member or interaction.user
-        async with self.db.execute("SELECT xp, level FROM levels WHERE user_id = ? AND guild_id = ?",
+        async with self.bot.db.execute("SELECT xp, level FROM levels WHERE user_id = ? AND guild_id = ?",
                                    (member.id, interaction.guild.id)
                                    ) as cursor:
             row = await cursor.fetchone()
@@ -85,7 +79,7 @@ class Levels(commands.Cog):
 
     @app_commands.command(description="Show the top 10 users by level")
     async def leaderboard(self, interaction: discord.Interaction):
-        async with self.db.execute(
+        async with self.bot.db.execute(
             "SELECT user_id, xp, level FROM levels WHERE guild_id = ? ORDER BY level DESC, xp DESC LIMIT 10",
             (interaction.guild.id, )
         ) as cursor:
