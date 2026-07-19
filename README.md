@@ -6,6 +6,7 @@ A Discord bot built with Python and [discord.py](https://github.com/Rapptz/disco
 
 - 🎵 **Music playback** — SoundCloud search, Spotify links, and direct YouTube links (via Lavalink + LavaSrc)
 - 📜 **Queue system** — queue up multiple songs, auto-plays the next one when a track ends
+- 🆙 **Levels System** — members gain XP by chatting and level up over time
 - 🔫 **Snipe** — recover recently deleted or edited messages
 - 👋 **Welcome & leave messages**
 - 📊 **Dynamic presence** showing server count
@@ -22,6 +23,8 @@ A Discord bot built with Python and [discord.py](https://github.com/Rapptz/disco
 | `/snipe`                   | Shows the last deleted message in the channel.                                                                 |
 | `/editsnipe`               | Shows the last edited message in the channel (before & after).                                                 |
 | `/pfp [member]`            | Shows a member's avatar. Leave empty for your own.                                                             |
+| `/rank [member = optional]`| Shows a member's level and XP. Leave empty for your own.                                                       |
+| `/leaderboard`             | Shows the top 10 members with the highest levels.                                                              |
 
 ## Tech Stack
 
@@ -31,6 +34,7 @@ A Discord bot built with Python and [discord.py](https://github.com/Rapptz/disco
   - **SoundCloud** as the primary audio source
   - [LavaSrc](https://github.com/topi314/LavaSrc) plugin — Spotify links resolved through SoundCloud
 - **python-dotenv** for configuration
+- **aiosqlite** — persistent storage for the leveling system
 
 ## Project Structure
 
@@ -43,6 +47,8 @@ CONTINENTAL/
     ├── mainCommands.py  # General commands
     ├── music.py         # Music commands
     ├── events.py        # Event listeners
+    ├── adminCommands.py # Moderation commands
+    ├── levels.py        # XP and leveling system
     └── snipe.py         # Snipe commands (deleted/edited messages)
 ```
 
