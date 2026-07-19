@@ -1,8 +1,11 @@
 import discord
 from discord import app_commands
-from discord.ext import commands
 from utils import make_embed, send_error_embed, send_success_embed
 import calendar
+import datetime
+from discord.ext import commands, tasks
+
+MIDNIGHT = datetime.time(hour=0, minute=0, tzinfo=datetime.timezone.utc)
 
 class mainCommands(commands.Cog):
     def __init__(self, bot):
@@ -18,7 +21,8 @@ class mainCommands(commands.Cog):
             )
         """)
         await self.bot.db.commit()
-
+        self.birthday_check.start()
+    
     @app_commands.command(description= "Get an avatar. Leave empty for your own, or mention someone to get theirs.")
     async def pfp(self, interaction: discord.Interaction, thatuser: discord.Member = None):
         target = thatuser or interaction.user
@@ -49,6 +53,26 @@ class mainCommands(commands.Cog):
             await send_error_embed(interaction, "You don't have a birthday saved.")
             return
         await send_success_embed(interaction, "Your birthday has been removed. 🗑️")
+
+    @tasks.loop(time=MIDNIGHT)
+    async def birthday_check(self):
+        today = datetime.datetime.now(datetime.timezone.utc)
+        async with self.bot.db.execute(
+            "SELECT user_id FROM birthdays WHERE day = ? AND month = ?",
+            (today.day, today.month)
+        ) as cursor:
+            rows = await cursor.fetchall()
+
+        for (user_id,) in rows:
+            try:
+                user = await self.bot.fetch_user(user_id)
+                await user.send(
+                    embed=make_embed(None, "Happy Birthday! 🎂",
+                                     description="CONTINENTAL wishes you a wonderful birthday! 🎉",
+                                     color=discord.Color.gold())
+                )
+            except discord.Forbidden:
+                pass
 
 async def setup(bot):
     await bot.add_cog(mainCommands(bot))
