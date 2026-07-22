@@ -29,7 +29,7 @@ class Levels(commands.Cog):
         now = time.time()
         key = (message.author.id, message.guild.id)
         if message.author.id not in (979460790178443285, 852889536840073247):
-            if now - self.cooldowns.get(key, 0) < 10:
+            if now - self.cooldowns.get(key, 0) < 15:
                 return
             self.cooldowns[key] = now
         await self.bot.db.execute("""
