@@ -22,8 +22,8 @@ A Discord bot built with Python and [discord.py](https://github.com/Rapptz/disco
 | `/leave`                   | Disconnects the bot from the voice channel.                                                                    |
 | `/snipe`                   | Shows the last deleted message in the channel.                                                                 |
 | `/editsnipe`               | Shows the last edited message in the channel (before & after).                                                 |
-| `/pfp [member]`            | Shows a member's avatar. Leave empty for your own.                                                             |
-| `/rank [member = optional]`| Shows a member's level and XP. Leave empty for your own.                                                       |
+| `/pfp [member: optional]`            | Shows a member's avatar. Leave empty for your own.                                                             |
+| `/rank [member: optional]`| Shows a member's level and XP. Leave empty for your own.                                                       |
 | `/leaderboard`             | Shows the top 10 members with the highest levels.                                                              |
 
 ## Tech Stack
