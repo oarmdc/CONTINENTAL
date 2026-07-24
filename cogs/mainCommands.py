@@ -7,7 +7,7 @@ from discord.ext import commands, tasks
 
 MIDNIGHT = datetime.time(hour=0, minute=0, tzinfo=datetime.timezone.utc)
 
-class mainCommands(commands.Cog):
+class MainCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         
@@ -75,4 +75,4 @@ class mainCommands(commands.Cog):
                 pass
 
 async def setup(bot):
-    await bot.add_cog(mainCommands(bot))
+    await bot.add_cog(MainCommands(bot))
