@@ -5,7 +5,7 @@ import wavelink
 from utils import make_embed, send_error_embed, send_success_embed
 
 
-class music(commands.Cog):
+class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -63,7 +63,7 @@ class music(commands.Cog):
             else:
                 player.skip_end = False  # nothing found, let the queue move on
     
-    @app_commands.command()
+    @app_commands.command(description="Play music!")
     async def play(self, interaction: discord.Interaction, query: str):
         await interaction.response.defer()
         if interaction.user.voice is None:
@@ -93,7 +93,7 @@ class music(commands.Cog):
             await player.play(track)
             await interaction.followup.send(embed=make_embed(interaction, f"Track found: {track.title}", color=discord.Color.light_grey()))
     
-    @app_commands.command()
+    @app_commands.command(description="Skip to the next song in queue")
     async def skip(self, interaction: discord.Interaction):
         if interaction.user.voice is None:
             await send_error_embed(interaction, "You are not connected to a voice channel.")
@@ -107,7 +107,7 @@ class music(commands.Cog):
         await interaction.guild.voice_client.stop()
         await send_success_embed(interaction, "Skipped.")
 
-    @app_commands.command()
+    @app_commands.command(description="Stop music and clear queue")
     async def stop(self, interaction: discord.Interaction):
         if interaction.user.voice is None:
             await send_error_embed(interaction, "You are not connected to a voice channel.")
@@ -122,7 +122,7 @@ class music(commands.Cog):
         await interaction.guild.voice_client.stop()
         await send_success_embed(interaction, "Music is now stopped.")
 
-    @app_commands.command()
+    @app_commands.command(description="Kick the bot from the VC and clear the queue")
     async def leave(self, interaction: discord.Interaction):
         if interaction.user.voice is None:
             await send_error_embed(interaction, "You are not connected to a voice channel.")
@@ -135,7 +135,7 @@ class music(commands.Cog):
         await interaction.guild.voice_client.disconnect()
         await send_success_embed(interaction, "I am now disconnected from the voice channel.")
 
-    @app_commands.command()
+    @app_commands.command(description="Returns the current queue")
     async def queue(self, interaction: discord.Interaction):
         if interaction.guild.voice_client is None or interaction.guild.voice_client.queue.is_empty:
             await send_error_embed(interaction, "The queue is empty.")
@@ -144,4 +144,4 @@ class music(commands.Cog):
         await interaction.response.send_message(embed=make_embed(interaction, "Queue", description=songs, color=discord.Color.light_grey()))
 
 async def setup(bot):
-    await bot.add_cog(music(bot))
+    await bot.add_cog(Music(bot))
