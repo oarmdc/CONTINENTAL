@@ -3,7 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 from utils import make_embed, send_error_embed, send_success_embed
 
-class adminCommands(commands.Cog):
+class AdminCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
@@ -40,4 +40,4 @@ class adminCommands(commands.Cog):
             await send_error_embed(interaction, "You don't have permission to use this command.")
 
 async def setup(bot):
-    await bot.add_cog(adminCommands(bot))
+    await bot.add_cog(AdminCommands(bot))
