@@ -45,7 +45,7 @@ class Snipe(commands.Cog):
             "timestamp": datetime.now(timezone.utc),
         }
 
-    @app_commands.command()
+    @app_commands.command(description="Returns the last deleted message in the channel")
     async def snipe(self, interaction: discord.Interaction):
         data = self.deleted_messages.get(interaction.channel.id)
         if data is None:
@@ -62,7 +62,7 @@ class Snipe(commands.Cog):
         )
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command()
+    @app_commands.command(description="Returns the before and after of the last edited message in the channel")
     async def editsnipe(self, interaction: discord.Interaction):
         data = self.edited_messages.get(interaction.channel.id)
         if data is None:
