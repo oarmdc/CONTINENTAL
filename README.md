@@ -1,55 +1,50 @@
 # CONTINENTAL
 
-A Discord bot built with Python and [discord.py](https://github.com/Rapptz/discord.py), featuring music playback powered by a self-hosted [Lavalink](https://github.com/lavalink-devs/Lavalink) server. All commands are slash commands.
+A Discord bot built with Python and discord.py, made by oarm and camarovx as a side project to learn the ropes of bot development, slash commands, and self-hosted infrastructure. Started as a simple music bot with prefix commands, and has since grown into something a lot more complete.
 
-## Features
+## What it does
 
-- 🎵 **Music playback** — SoundCloud search, Spotify links, and direct YouTube links (via Lavalink + LavaSrc)
-- 📜 **Queue system** — queue up multiple songs, auto-plays the next one when a track ends
-- 🆙 **Levels System** — members gain XP by chatting and level up over time
-- 🔫 **Snipe** — recover recently deleted or edited messages
-- 👋 **Welcome & leave messages**
-- 📊 **Dynamic presence** showing server count
+**Music** — Plays songs from SoundCloud, YouTube, and Spotify (via a self-hosted Lavalink server), with a queue system and automatic retry logic when a track fails to load.
 
-## Commands
+**Leveling** — Members earn XP by chatting, with a cooldown to prevent spam. Check your progress with `/rank` or see who's on top with `/leaderboard`.
 
-| Command                    | Description                                                                                                    |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `/play <song name / URL>`  | Plays a song, or adds it to the queue if something is already playing. Joins your voice channel automatically. |
-| `/skip`                    | Skips the current song and plays the next one in queue.                                                        |
-| `/queue`                   | Shows the current song queue.                                                                                  |
-| `/stop`                    | Stops playback and clears the queue.                                                                           |
-| `/leave`                   | Disconnects the bot from the voice channel.                                                                    |
-| `/snipe`                   | Shows the last deleted message in the channel.                                                                 |
-| `/editsnipe`               | Shows the last edited message in the channel (before & after).                                                 |
-| `/pfp [member: optional]`  | Shows a member's avatar. Leave empty for your own.                                                             |
-| `/rank [member: optional]` | Shows a member's level and XP. Leave empty for your own.                                                       |
-| `/leaderboard`             | Shows the top 10 members with the highest levels.                                                              |
+**Economy** — A fake currency system for fun. Claim daily rewards, send money to other members, or top up balances if you're an admin. Balances are shared across every server the bot is in, and you can choose to keep yours private.
 
-## Tech Stack
+**Birthdays** — Save your birthday and get a DM from the bot when the day comes around.
 
-- **Python 3.12** with [discord.py](https://github.com/Rapptz/discord.py)
-- **[Wavelink](https://github.com/PythonistaGuild/Wavelink)** — Lavalink client for discord.py
-- **[Lavalink v4](https://github.com/lavalink-devs/Lavalink)** — audio server (self-hosted on a VPS)
-  - **SoundCloud** as the primary audio source
-  - [LavaSrc](https://github.com/topi314/LavaSrc) plugin — Spotify links resolved through SoundCloud
-- **python-dotenv** for configuration
-- **aiosqlite** — persistent storage for the leveling system
+**Snipe** — Recover recently deleted or edited messages in a channel.
 
-## Project Structure
+**Moderation** — Basic ban and kick commands for admins.
+
+**Valorant stats** — Look up a player's current rank, peak rank, and account details straight from Discord.
+
+Run `/help` in any server the bot is in to see the full, always-up-to-date list of commands.
+
+## Tech stack
+
+- Python 3.12, discord.py (slash commands via app_commands)
+- Wavelink as the Lavalink client
+- Lavalink v4, self-hosted on an Azure VM, with the youtube-source and LavaSrc plugins
+- aiosqlite for persistent storage (levels, birthdays, economy)
+- python-dotenv for configuration
+
+## Project structure
 
 ```
 CONTINENTAL/
-├── bot.py               # Connection logic, cog loading, Lavalink node setup
-├── utils.py             # Shared helpers (embeds)
+├── bot.py               # Bot setup, cog loading, Lavalink connection
+├── utils.py              # Shared embed helpers
 ├── requirements.txt
 └── cogs/
-    ├── mainCommands.py  # General commands
-    ├── music.py         # Music commands
-    ├── events.py        # Event listeners
-    ├── adminCommands.py # Moderation commands
-    ├── levels.py        # XP and leveling system
-    └── snipe.py         # Snipe commands (deleted/edited messages)
+    ├── mainCommands.py   # Profile pictures, birthdays
+    ├── music.py          # Music playback and queue
+    ├── levels.py         # XP and leveling
+    ├── money.py          # Economy system
+    ├── adminCommands.py  # Moderation
+    ├── snipe.py          # Message recovery
+    ├── valorant.py        # Valorant stats lookup
+    ├── help.py            # Auto-generated help command
+    └── events.py          # Welcome/leave messages, presence updates
 ```
 
 ## Setup
@@ -60,7 +55,7 @@ CONTINENTAL/
 git clone https://github.com/oarmdc/CONTINENTAL.git
 cd CONTINENTAL
 python -m venv venv
-venv\Scripts\activate        # Windows
+venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
@@ -72,13 +67,14 @@ Create a `.env` file in the project root:
 DISCORD_TOKEN=your_discord_bot_token
 LAVALINK_HOST=your_lavalink_server_ip
 LAVALINK_PASSWORD=your_lavalink_password
+HENRIK_API_KEY=your_henrikdev_api_key
 ```
 
-> ⚠️ Never commit your `.env` file. It's already in `.gitignore`.
+Never commit this file. It's already listed in `.gitignore`.
 
 ### 3. Lavalink server
 
-This bot requires a running **Lavalink v4** server with SoundCloud enabled and the `LavaSrc` plugin for Spotify support. See the [Lavalink docs](https://lavalink.dev/) for hosting instructions.
+You'll need a running Lavalink v4 server with the youtube-source and LavaSrc plugins installed. See the [Lavalink docs](https://lavalink.dev/) for setup instructions.
 
 ### 4. Run
 
@@ -88,4 +84,4 @@ python bot.py
 
 ## Credits
 
-Developed by **oarm** and **camarovx**. Built as a learning project — from `yt-dlp` beginnings to a self-hosted Lavalink server.
+Built by oarm and camarovx, as a learning project that's grown well past its original scope.
