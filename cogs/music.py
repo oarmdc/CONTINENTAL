@@ -14,11 +14,12 @@ class Music(commands.Cog):
         player = payload.player
         if player is None or player.home is None:
             return
-        if getattr(player, "retry_id", None) == payload.track.identifier:
-            return  # same track restarting after a retry, stay silent
-        player.retry_id = None  # a new track started fresh, clear old marker
         track = payload.track
-        player.now_msg = await player.home.send(embed=make_embed(None, f"Playing now: {track.title}", description=f"Source: {track.source.capitalize()}", image=track.artwork, color=discord.Color.light_grey()))
+        await player.home.send(embed=make_embed(
+            None, f"Playing now: {track.title}",
+            description=f"Source: {track.source.capitalize()}",
+            image=track.artwork, color=discord.Color.light_grey()
+        ))
 
     @commands.Cog.listener()
     async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload):
@@ -27,8 +28,6 @@ class Music(commands.Cog):
             return
         if getattr(player, "skip_end", False):
             player.skip_end = False
-            return  # this end was caused by our retry/fallback, ignore it
-        if payload.reason == "loadFailed":
             return
         if not player.queue.is_empty:
             await player.play(player.queue.get())
@@ -38,31 +37,14 @@ class Music(commands.Cog):
     @commands.Cog.listener()
     async def on_wavelink_track_exception(self, payload: wavelink.TrackExceptionEventPayload):
         player = payload.player
-        if player is None:
+        if player is None or player.home is None:
             return
-        msg = getattr(player, "now_msg", None)
-        if msg:
-            try:
-                await msg.delete()
-            except discord.NotFound:
-                pass
-            player.now_msg = None
-        if payload.track.source == "soundcloud":
-            return  # SoundCloud failed too, give up on this track
-        if getattr(player, "retry_id", None) != payload.track.identifier:
-            player.retry_id = payload.track.identifier
-            player.skip_end = True
-            await player.play(payload.track)
-        else:
-            player.skip_end = True
-            if player.home:
-                await player.home.send(embed=make_embed(None, "⚠️ YouTube failed", description="Failed to fetch this track on YouTube, trying SoundCloud...", color=discord.Color.orange()))
-            tracks = await wavelink.Playable.search(payload.track.title, source=wavelink.TrackSource.SoundCloud)
-            if tracks:
-                await player.play(tracks[0])
-            else:
-                player.skip_end = False  # nothing found, let the queue move on
-    
+        await player.home.send(embed=make_embed(
+            None, "⚠️ Playback failed",
+            description=f"Couldn't play **{payload.track.title}**. Skipping.",
+            color=discord.Color.orange()
+        ))
+
     @app_commands.command(description="Play music!")
     async def play(self, interaction: discord.Interaction, query: str):
         await interaction.response.defer()
@@ -78,10 +60,7 @@ class Music(commands.Cog):
         else:
             player = interaction.guild.voice_client
         player.home = interaction.channel
-        
-        tracks = await wavelink.Playable.search(query)
-        if not tracks:
-            tracks = await wavelink.Playable.search(query, source=wavelink.TrackSource.SoundCloud)
+        tracks = await wavelink.Playable.search(query, source="dzsearch")
         if not tracks:
             await send_error_embed(interaction, "Couldn't find anything for that query.")
             return
@@ -91,8 +70,8 @@ class Music(commands.Cog):
             await interaction.followup.send(embed=make_embed(interaction, f"Added to queue: {track.title}", thumbnail=track.artwork, color=discord.Color.light_grey()))
         else:
             await player.play(track)
-            await interaction.followup.send(embed=make_embed(interaction, f"Track found: {track.title}", color=discord.Color.light_grey()))
-    
+            await interaction.delete_original_response()
+
     @app_commands.command(description="Skip to the next song in queue")
     async def skip(self, interaction: discord.Interaction):
         if interaction.user.voice is None:
@@ -142,6 +121,7 @@ class Music(commands.Cog):
             return
         songs = "\n".join(f"{i+1}. {track.title}" for i, track in enumerate(interaction.guild.voice_client.queue))
         await interaction.response.send_message(embed=make_embed(interaction, "Queue", description=songs, color=discord.Color.light_grey()))
+
 
 async def setup(bot):
     await bot.add_cog(Music(bot))
