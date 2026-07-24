@@ -22,7 +22,6 @@ async def on_ready():
 @bot.event
 async def on_wavelink_node_ready(payload: wavelink.NodeReadyEventPayload):
     print(f"Lavalink node ready: {payload.node.identifier}")
-
 @bot.event
 async def setup_hook():
     bot.db = await aiosqlite.connect("database.db")
@@ -34,6 +33,7 @@ async def setup_hook():
     await bot.load_extension("cogs.levels")
     await bot.load_extension("cogs.valorant")
     await bot.load_extension("cogs.money")
+    await bot.load_extension("cogs.help")
     await bot.tree.sync()
     node = wavelink.Node(uri=f"http://{os.getenv('LAVALINK_HOST')}:2333", password=os.getenv("LAVALINK_PASSWORD"))
     await wavelink.Pool.connect(nodes=[node], client=bot)
