@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from utils import send_error_embed, send_success_embed, make_embed
+import time
+import random
 
 class Money(commands.Cog):
     def __init__(self, bot):
@@ -13,6 +15,7 @@ class Money(commands.Cog):
                 user_id INTEGER,
                 balance INTEGER DEFAULT 0,
                 public INTEGER DEFAULT 1,
+                last_daily INTEGER DEFAULT 0,
                 PRIMARY KEY (user_id)
             )
         """)
@@ -29,7 +32,7 @@ class Money(commands.Cog):
             ON CONFLICT(user_id)
             DO UPDATE SET balance = balance + ?
         """, (member.id, amount, amount))
-        await self.bot.db.commit() 
+        await self.bot.db.commit()
         await interaction.response.send_message(embed=make_embed(interaction,
                                                                 f"Money added to {member.name}!",
                                                                 thumbnail="https://i.pinimg.com/736x/61/b4/e0/61b4e0456d99894da978a153a4030320.jpg",
@@ -53,18 +56,12 @@ class Money(commands.Cog):
         if public == 0 and member.id != interaction.user.id:
             await send_error_embed(interaction, f"{member.name}'s balance is private...")
             return
-        if public == 0 and member.id == interaction.user.id:
-            await interaction.response.send_message(embed=make_embed(interaction,
-                                                                    f"{member.name}'s balance:",
-                                                                    thumbnail="https://i.pinimg.com/736x/61/b4/e0/61b4e0456d99894da978a153a4030320.jpg",
-                                                                    description=f"{balance}USD"),
-                                                                    ephemeral=True
-                                                                    )
-            return
+        ephemeral = (public == 0)
         await interaction.response.send_message(embed=make_embed(interaction,
                                                                             f"{member.name}'s balance:",
                                                                             thumbnail="https://i.pinimg.com/736x/61/b4/e0/61b4e0456d99894da978a153a4030320.jpg",
-                                                                            description=f"{balance}USD")
+                                                                            description=f"{balance}USD"),
+                                                                            ephemeral=ephemeral
                                                                             )
         
     @app_commands.command(description="Set your balance privacy")
@@ -81,9 +78,67 @@ class Money(commands.Cog):
         await send_success_embed(interaction, f"Your balance is now **{state}**.")
 
     @app_commands.command(description="Send money to someone else")
-    @app_commands.describe(member="Receiver")
-    async def sendmoney(self, interaction: discord.Interaction, member: discord.Member):
-        ...
+    @app_commands.describe(member="Receiver", amount="Amount of money to send in USD")
+    async def sendmoney(self, interaction: discord.Interaction, member: discord.Member, amount: app_commands.Range[int, 1]):
+        if member.id == interaction.user.id:
+            await send_error_embed(interaction, "You can't send money to yourself.")
+            return
+        if member.bot:
+            await send_error_embed(interaction, "You can't send money to a bot.")
+            return
+        async with self.bot.db.execute("SELECT balance FROM money WHERE user_id = ?",
+                                       (interaction.user.id,)
+                                       ) as cursor:
+                    row = await cursor.fetchone()
+        if row is None:
+            await send_error_embed(interaction, f"{interaction.user.display_name} has no balance yet.")
+            return
+        senderbalance = row[0]
+        if (senderbalance < amount):
+             await send_error_embed(interaction, f"You don't have enough money to do that... Your balance is: {senderbalance}")
+             return
+        await self.bot.db.execute("""
+            INSERT INTO money (user_id, balance)
+            VALUES (?, ?)
+            ON CONFLICT(user_id)
+            DO UPDATE SET balance = balance + ?
+        """, (member.id, amount, amount))
+        await self.bot.db.execute("""
+            INSERT INTO money (user_id, balance)
+            VALUES (?, ?)
+            ON CONFLICT(user_id)
+            DO UPDATE SET balance = balance - ?
+        """, (interaction.user.id, amount, amount))
+        await self.bot.db.commit()
+        await send_success_embed(interaction, f"Done! {amount}USD have been transferred to {member.display_name}")
+
+    @app_commands.command(description="Claim your daily money")
+    async def daily(self, interaction: discord.Interaction):
+        now = int(time.time())
+        async with self.bot.db.execute("SELECT last_daily FROM money WHERE user_id = ?",
+                                   (interaction.user.id,)
+                                   ) as cursor:
+            row = await cursor.fetchone()
+        last_daily = row[0] if row else 0
+        elapsed = now - last_daily
+        if elapsed < 86400:
+            remaining = 86400 - elapsed
+            hours = remaining // 3600
+            minutes = (remaining % 3600) // 60
+            await send_error_embed(interaction, f"You already claimed today. Try again in {hours}h {minutes}m.")
+            return
+        reward = random.randint(50, 150)
+        await self.bot.db.execute("""
+            INSERT INTO money (user_id, balance, last_daily)
+            VALUES (?, ?, ?)
+            ON CONFLICT(user_id)
+            DO UPDATE SET balance = balance + ?, last_daily = ?
+        """, (interaction.user.id, reward, now, reward, now))
+        await self.bot.db.commit()
+        await send_success_embed(interaction, f"You claimed your daily reward: **{reward}**USD.")
+        
+
+         
 
 async def setup(bot):
     await bot.add_cog(Money(bot))
